@@ -1,5 +1,8 @@
 package com.alecalbright.skyrimbuildanalyzer.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +24,8 @@ public class Character {
     private int archerySkill;
     private int sneakSkill;
 
+    private Set<Perk> perks;
+
     private final Weapon weapon;
 
     public Character(String name, double maxHealth, double maxStamina, double maxMagicka, Weapon weapon) {
@@ -39,6 +44,7 @@ public class Character {
         this.archerySkill = 0;
         this.sneakSkill = 0;
 
+        this.perks = new HashSet<>();
     }
 
     public boolean isAlive(){
@@ -60,6 +66,29 @@ public class Character {
 
     public double calculateDamage(){
         return weapon.getBaseDamage();
+    }
+
+    public void addPerk(Perk perk){
+        this.perks.add(perk);
+    }
+
+    public boolean hasPerk(Perk perk){
+        return this.perks.contains(perk);
+    }
+
+    public Set<Perk> getPerks(){
+        return Set.copyOf(perks);
+    }
+
+    public double getPerkDamageMultiplier(){
+        double multiplier = 1.0;
+        for (Perk perk : perks) {
+            if(perk.boostsDamage()){
+                multiplier *= perk.getMultiplier();
+            }
+        }
+
+        return multiplier;
     }
 
     @Override
