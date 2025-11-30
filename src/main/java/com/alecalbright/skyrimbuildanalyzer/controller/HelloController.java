@@ -4,21 +4,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alecalbright.skyrimbuildanalyzer.model.Character;
+import com.alecalbright.skyrimbuildanalyzer.model.CombatEvent;
 import com.alecalbright.skyrimbuildanalyzer.model.Perk;
 import com.alecalbright.skyrimbuildanalyzer.model.Weapon;
 import com.alecalbright.skyrimbuildanalyzer.model.WeaponType;
 
 @RestController
 public class HelloController {
-    
-    @GetMapping("/hello")
-    public String hello(){
-        return "Hello from Skyrim Build Analyzer!";
-    }
-    
+
     @GetMapping("/")
     public String home(){
         return "Welcome to Skyrim Build Analyzer API! Try /hello endpoint.";
+    }
+
+    @GetMapping("/hello")
+    public String hello(){
+        return "Hello from Skyrim Build Analyzer!";
     }
 
     @GetMapping("/status")
@@ -144,6 +145,67 @@ public class HelloController {
     double withPerks = baseDamage * assassin.getPerkDamageMultiplier();
     result.append("\nDamage without perks: ").append(baseDamage).append("\n");
     result.append("Damage with perks: ").append(withPerks).append("\n");
+    
+    return result.toString().replace("\n", "<br>");
+    }
+
+    @GetMapping("/test-combat-event")
+    public String testCombatEvent() {
+    StringBuilder result = new StringBuilder();
+    
+    // Create some combat events
+    CombatEvent normalAttack = CombatEvent.now(
+        "Stealth Archer",
+        "Two-Handed Warrior",
+        45.5,
+        "Ebony Bow",
+        false,
+        false
+    );
+    
+    CombatEvent criticalHit = CombatEvent.now(
+        "Two-Handed Warrior",
+        "Stealth Archer",
+        89.0,
+        "Dragonbone Greatsword",
+        true,
+        false
+    );
+    
+    CombatEvent sneakAttack = CombatEvent.now(
+        "Stealth Archer",
+        "Two-Handed Warrior",
+        285.0,
+        "Ebony Bow",
+        false,
+        true
+    );
+    
+    CombatEvent criticalSneakAttack = CombatEvent.now(
+        "Assassin",
+        "Unsuspecting Guard",
+        1650.0,
+        "Ebony Dagger",
+        true,
+        true
+    );
+    
+    // Display events
+    result.append("=== COMBAT LOG ===\n\n");
+    
+    result.append("Event 1: ").append(normalAttack).append("\n");
+    result.append("  Attacker: ").append(normalAttack.attackerName()).append("\n");
+    result.append("  Damage: ").append(normalAttack.damageDealt()).append("\n");
+    result.append("  Special? ").append(normalAttack.isSpecialAttack()).append("\n\n");
+    
+    result.append("Event 2: ").append(criticalHit).append("\n");
+    result.append("  Special? ").append(criticalHit.isSpecialAttack()).append("\n\n");
+    
+    result.append("Event 3: ").append(sneakAttack).append("\n");
+    result.append("  Special? ").append(sneakAttack.isSpecialAttack()).append("\n\n");
+    
+    result.append("Event 4: ").append(criticalSneakAttack).append("\n");
+    result.append("  Special? ").append(criticalSneakAttack.isSpecialAttack()).append("\n");
     
     return result.toString().replace("\n", "<br>");
     }
