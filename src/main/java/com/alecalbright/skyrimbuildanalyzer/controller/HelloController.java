@@ -8,6 +8,9 @@ import com.alecalbright.skyrimbuildanalyzer.model.CombatEvent;
 import com.alecalbright.skyrimbuildanalyzer.model.Perk;
 import com.alecalbright.skyrimbuildanalyzer.model.Weapon;
 import com.alecalbright.skyrimbuildanalyzer.model.WeaponType;
+import com.alecalbright.skyrimbuildanalyzer.simulation.CombatSimulator;
+import com.alecalbright.skyrimbuildanalyzer.simulation.FightResult;
+import com.alecalbright.skyrimbuildanalyzer.simulation.MultiSimulationResult;
 
 @RestController
 public class HelloController {
@@ -208,5 +211,157 @@ public class HelloController {
     result.append("  Special? ").append(criticalSneakAttack.isSpecialAttack()).append("\n");
     
     return result.toString().replace("\n", "<br>");
+    }
+
+    // @GetMapping("/test-combat")
+    // public String testCombat() {
+    // // Create two weapons
+    // Weapon bow = new Weapon(
+    //     "Ebony Bow",
+    //     19.0,
+    //     1.0,
+    //     WeaponType.BOW
+    // );
+    
+    // Weapon greatsword = new Weapon(
+    //     "Dragonbone Greatsword",
+    //     25.0,
+    //     0.7,
+    //     WeaponType.TWO_HANDED_GREATSWORD
+    // );
+    
+    // // Create two characters
+    // Character stealthArcher = new Character(
+    //     "Stealth Archer",
+    //     200.0,  // health
+    //     250.0,  // stamina
+    //     100.0,  // magicka
+    //     bow
+    // );
+    
+    // Character warrior = new Character(
+    //     "Two-Handed Warrior",
+    //     400.0,  // Much more health!
+    //     250.0,
+    //     100.0,
+    //     greatsword
+    // );
+    
+    // // Create simulator
+    // CombatSimulator simulator = new CombatSimulator();
+    
+    // // FIGHT!
+    // String winner = simulator.simulateFight(stealthArcher, warrior);
+    
+    // // Build result string
+    // StringBuilder result = new StringBuilder();
+    // result.append("=== COMBAT RESULTS ===\n\n");
+    // result.append("Fighter 1: ").append(stealthArcher.getName()).append("\n");
+    // result.append("  Weapon: ").append(bow.getName()).append(" (").append(bow.getBaseDamage()).append(" damage)\n");
+    // result.append("  Starting Health: 200\n");
+    // result.append("  Remaining Health: ").append(stealthArcher.getHealth()).append("\n\n");
+    
+    // result.append("Fighter 2: ").append(warrior.getName()).append("\n");
+    // result.append("  Weapon: ").append(greatsword.getName()).append(" (").append(greatsword.getBaseDamage()).append(" damage)\n");
+    // result.append("  Starting Health: 400\n");
+    // result.append("  Remaining Health: ").append(warrior.getHealth()).append("\n\n");
+    
+    // result.append("WINNER: ").append(winner).append("!\n");
+    
+    // return result.toString().replace("\n", "<br>");
+    // }
+
+    @GetMapping("/test-multi-combat")
+    public String testMultiCombat() {
+    // Create weapons
+    Weapon bow = new Weapon("Ebony Bow", 19.0, 1.0, WeaponType.BOW);
+    Weapon greatsword = new Weapon("Dragonbone Greatsword", 25.0, 0.7, WeaponType.TWO_HANDED_GREATSWORD);
+    
+    // Create characters
+    Character stealthArcher = new Character("Stealth Archer", 200.0, 250.0, 100.0, bow);
+    Character warrior = new Character("Two-Handed Warrior", 400.0, 250.0, 100.0, greatsword);
+    
+    // Create simulator
+    CombatSimulator simulator = new CombatSimulator();
+    
+    // Simulate 100 fights
+    MultiSimulationResult results = simulator.simulateMultipleFights(stealthArcher, warrior, 100);
+    
+    // Build detailed result string
+    StringBuilder output = new StringBuilder();
+    output.append("=== COMBAT SIMULATION: 100 FIGHTS ===\n\n");
+    
+    output.append("Fighter 1: ").append(results.getFighter1Name()).append("\n");
+    output.append("  Wins: ").append(results.getFighter1Wins()).append("\n");
+    output.append("  Win Rate: ").append(String.format("%.1f", results.getFighter1WinRate())).append("%\n\n");
+    
+    output.append("Fighter 2: ").append(results.getFighter2Name()).append("\n");
+    output.append("  Wins: ").append(results.getFighter2Wins()).append("\n");
+    output.append("  Win Rate: ").append(String.format("%.1f", results.getFighter2WinRate())).append("%\n\n");
+    
+    // ← ADD DRAW INFORMATION
+    output.append("Draws: ").append(results.getDraws()).append("\n");
+    output.append("Draw Rate: ").append(String.format("%.1f", results.getDrawRate())).append("%\n\n");
+    
+    output.append("Overall Winner: ").append(results.getOverallWinner()).append("\n");
+    output.append("Win Margin: ").append(results.getWinMargin()).append(" fights\n");
+    output.append("Statistically Significant? ").append(results.isSignificant() ? "YES" : "NO").append("\n");
+    
+    // ← ADD DATA CONSISTENCY CHECK
+    output.append("Data Consistent? ").append(results.isDataConsistent() ? "YES" : "NO").append("\n\n");
+    
+    // Show sample of individual fights
+    output.append("=== SAMPLE FIGHTS ===\n\n");
+    for (int i = 0; i < Math.min(5, results.getAllFights().size()); i++) {
+        FightResult fight = results.getAllFights().get(i);
+        output.append("Fight ").append(i + 1).append(": ").append(fight.toString()).append("\n");
+    }
+    
+    return output.toString().replace("\n", "<br>");
+    }
+
+    @GetMapping("/test-draw-scenario")
+    public String testDrawScenario() {
+    // Create two weapons with ZERO damage - forces timeout draw
+    Weapon noDamageWeapon1 = new Weapon("Wooden Stick", 0.0, 1.0, WeaponType.ONE_HANDED_SWORD);
+    Weapon noDamageWeapon2 = new Weapon("Broken Dagger", 0.0, 1.0, WeaponType.ONE_HANDED_DAGGER);
+    
+    // Create characters
+    Character fighter1 = new Character("Pacifist", 100.0, 100.0, 100.0, noDamageWeapon1);
+    Character fighter2 = new Character("Also Pacifist", 100.0, 100.0, 100.0, noDamageWeapon2);
+    
+    // Create simulator
+    CombatSimulator simulator = new CombatSimulator();
+    
+    // Simulate 10 fights (all should be draws!)
+    MultiSimulationResult results = simulator.simulateMultipleFights(fighter1, fighter2, 10);
+    
+    StringBuilder output = new StringBuilder();
+    output.append("=== DRAW SCENARIO TEST ===\n\n");
+    output.append("Both fighters have 0 damage weapons\n");
+    output.append("Expected: All fights should be draws (hit MAX_TURNS)\n\n");
+    
+    output.append("Results:\n");
+    output.append("  Fighter 1 Wins: ").append(results.getFighter1Wins()).append("\n");
+    output.append("  Fighter 2 Wins: ").append(results.getFighter2Wins()).append("\n");
+    output.append("  Draws: ").append(results.getDraws()).append("\n\n");
+    
+    output.append("Win Rates:\n");
+    output.append("  Fighter 1: ").append(String.format("%.1f", results.getFighter1WinRate())).append("%\n");
+    output.append("  Fighter 2: ").append(String.format("%.1f", results.getFighter2WinRate())).append("%\n");
+    output.append("  Draws: ").append(String.format("%.1f", results.getDrawRate())).append("%\n\n");
+    
+    output.append("Data Consistent? ").append(results.isDataConsistent() ? "YES ✓" : "NO ✗").append("\n\n");
+    
+    // Show first fight details
+    if (!results.getAllFights().isEmpty()) {
+        FightResult firstFight = results.getAllFights().get(0);
+        output.append("First Fight Details:\n");
+        output.append("  Winner: ").append(firstFight.getWinnerName()).append("\n");
+        output.append("  Total Turns: ").append(firstFight.getTotalTurns()).append("\n");
+        output.append("  Was Draw? ").append(firstFight.wasDraw() ? "YES" : "NO").append("\n");
+    }
+    
+    return output.toString().replace("\n", "<br>");
     }
 }
