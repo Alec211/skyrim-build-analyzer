@@ -213,63 +213,77 @@ public class HelloController {
     return result.toString().replace("\n", "<br>");
     }
 
-    // @GetMapping("/test-combat")
-    // public String testCombat() {
-    // // Create two weapons
-    // Weapon bow = new Weapon(
-    //     "Ebony Bow",
-    //     19.0,
-    //     1.0,
-    //     WeaponType.BOW
-    // );
-    
-    // Weapon greatsword = new Weapon(
-    //     "Dragonbone Greatsword",
-    //     25.0,
-    //     0.7,
-    //     WeaponType.TWO_HANDED_GREATSWORD
-    // );
-    
-    // // Create two characters
-    // Character stealthArcher = new Character(
-    //     "Stealth Archer",
-    //     200.0,  // health
-    //     250.0,  // stamina
-    //     100.0,  // magicka
-    //     bow
-    // );
-    
-    // Character warrior = new Character(
-    //     "Two-Handed Warrior",
-    //     400.0,  // Much more health!
-    //     250.0,
-    //     100.0,
-    //     greatsword
-    // );
-    
-    // // Create simulator
-    // CombatSimulator simulator = new CombatSimulator();
-    
-    // // FIGHT!
-    // String winner = simulator.simulateFight(stealthArcher, warrior);
-    
-    // // Build result string
-    // StringBuilder result = new StringBuilder();
-    // result.append("=== COMBAT RESULTS ===\n\n");
-    // result.append("Fighter 1: ").append(stealthArcher.getName()).append("\n");
-    // result.append("  Weapon: ").append(bow.getName()).append(" (").append(bow.getBaseDamage()).append(" damage)\n");
-    // result.append("  Starting Health: 200\n");
-    // result.append("  Remaining Health: ").append(stealthArcher.getHealth()).append("\n\n");
-    
-    // result.append("Fighter 2: ").append(warrior.getName()).append("\n");
-    // result.append("  Weapon: ").append(greatsword.getName()).append(" (").append(greatsword.getBaseDamage()).append(" damage)\n");
-    // result.append("  Starting Health: 400\n");
-    // result.append("  Remaining Health: ").append(warrior.getHealth()).append("\n\n");
-    
-    // result.append("WINNER: ").append(winner).append("!\n");
-    
-    // return result.toString().replace("\n", "<br>");
-    // }
+    @GetMapping("/test-combat")
+    public String testCombat() {
+        // Create two weapons
+        Weapon bow = new Weapon(
+            "Ebony Bow",
+            19.0,
+            1.0,
+            WeaponType.BOW
+        );
+        
+        Weapon greatsword = new Weapon(
+            "Dragonbone Greatsword",
+            25.0,
+            0.7,
+            WeaponType.TWO_HANDED_GREATSWORD
+        );
+        
+        // Create two characters
+        Character stealthArcher = new Character(
+            "Stealth Archer",
+            200.0,  // health
+            250.0,  // stamina
+            100.0,  // magicka
+            bow
+        );
+        
+        Character warrior = new Character(
+            "Two-Handed Warrior",
+            400.0,  // Much more health!
+            250.0,
+            100.0,
+            greatsword
+        );
+
+        // Create simulator
+        CombatSimulator simulator = new CombatSimulator();
+        
+        // Simulate fight - now returns FightResult!
+        FightResult fightResult = simulator.simulateFight(stealthArcher, warrior);
+        
+        // Build result string
+        StringBuilder result = new StringBuilder();
+        result.append("=== SINGLE COMBAT RESULT ===\n\n");
+        
+        result.append("Fighter 1: ").append(fightResult.fighter1Name()).append("\n");
+        result.append("  Weapon: ").append(bow.getName()).append(" (").append(bow.getBaseDamage()).append(" damage)\n");
+        result.append("  Starting Health: 200\n");
+        result.append("  Remaining Health: ").append(stealthArcher.getHealth()).append("\n");
+        result.append("  Total Damage Dealt: ").append(String.format("%.1f", fightResult.getTotalDamageByFighter(fightResult.fighter1Name()))).append("\n");
+        result.append("  Average Damage per Hit: ").append(String.format("%.1f", fightResult.getAverageDamageByFighter(fightResult.fighter1Name()))).append("\n\n");
+        
+        result.append("Fighter 2: ").append(fightResult.fighter2Name()).append("\n");
+        result.append("  Weapon: ").append(greatsword.getName()).append(" (").append(greatsword.getBaseDamage()).append(" damage)\n");
+        result.append("  Starting Health: 400\n");
+        result.append("  Remaining Health: ").append(warrior.getHealth()).append("\n");
+        result.append("  Total Damage Dealt: ").append(String.format("%.1f", fightResult.getTotalDamageByFighter(fightResult.fighter2Name()))).append("\n");
+        result.append("  Average Damage per Hit: ").append(String.format("%.1f", fightResult.getAverageDamageByFighter(fightResult.fighter2Name()))).append("\n\n");
+        
+        result.append("WINNER: ").append(fightResult.winnerName()).append("!\n");
+        result.append("Fight Duration: ").append(fightResult.totalTurns()).append(" turns\n");
+        result.append("Total Combat Events: ").append(fightResult.combatEvents().size()).append("\n\n");
+        
+        // Show first few combat events
+        result.append("=== COMBAT LOG (First 5 Events) ===\n\n");
+        int eventsToShow = Math.min(5, fightResult.combatEvents().size());
+        for (int i = 0; i < eventsToShow; i++) {
+            result.append("Event ").append(i + 1).append(": ").append(fightResult.combatEvents().get(i)).append("\n");
+        }
+        
+        return result.toString().replace("\n", "<br>");
+    }
 
     @GetMapping("/test-multi-combat")
     public String testMultiCombat() {
@@ -291,29 +305,34 @@ public class HelloController {
     StringBuilder output = new StringBuilder();
     output.append("=== COMBAT SIMULATION: 100 FIGHTS ===\n\n");
     
-    output.append("Fighter 1: ").append(results.getFighter1Name()).append("\n");
-    output.append("  Wins: ").append(results.getFighter1Wins()).append("\n");
-    output.append("  Win Rate: ").append(String.format("%.1f", results.getFighter1WinRate())).append("%\n\n");
-    
-    output.append("Fighter 2: ").append(results.getFighter2Name()).append("\n");
-    output.append("  Wins: ").append(results.getFighter2Wins()).append("\n");
-    output.append("  Win Rate: ").append(String.format("%.1f", results.getFighter2WinRate())).append("%\n\n");
-    
-    // ← ADD DRAW INFORMATION
-    output.append("Draws: ").append(results.getDraws()).append("\n");
-    output.append("Draw Rate: ").append(String.format("%.1f", results.getDrawRate())).append("%\n\n");
-    
-    output.append("Overall Winner: ").append(results.getOverallWinner()).append("\n");
-    output.append("Win Margin: ").append(results.getWinMargin()).append(" fights\n");
+    output.append("Fighter 1: ").append(results.fighter1Name()).append("\n");
+    output.append("  Wins: ").append(results.fighter1Wins()).append("\n");
+    output.append("  Win Rate: ").append(String.format("%.1f", results.fighter1WinRate())).append("%\n\n");
+
+    output.append("Fighter 2: ").append(results.fighter2Name()).append("\n");
+    output.append("  Wins: ").append(results.fighter2Wins()).append("\n");
+    output.append("  Win Rate: ").append(String.format("%.1f", results.fighter2WinRate())).append("%\n\n");
+
+    output.append("Draws: ").append(results.draws()).append("\n");
+    output.append("Draw Rate: ").append(String.format("%.1f", results.drawRate())).append("%\n\n");
+
+    output.append("Overall Winner: ").append(results.overallWinner()).append("\n");
+    output.append("Win Margin: ").append(results.winMargin()).append(" fights\n");
     output.append("Statistically Significant? ").append(results.isSignificant() ? "YES" : "NO").append("\n");
+    output.append("Data Consistent? ").append(results.isDataConsistent() ? "YES" : "NO").append("\n\n");
+
+    // Add new stats!
+    output.append("Average Fight Duration: ").append(String.format("%.1f", results.averageFightDuration())).append(" turns\n");
+    output.append("Shortest Fight: ").append(results.shortestFightDuration()).append(" turns\n");
+    output.append("Longest Fight: ").append(results.longestFightDuration()).append(" turns\n\n");
     
     // ← ADD DATA CONSISTENCY CHECK
     output.append("Data Consistent? ").append(results.isDataConsistent() ? "YES" : "NO").append("\n\n");
     
     // Show sample of individual fights
     output.append("=== SAMPLE FIGHTS ===\n\n");
-    for (int i = 0; i < Math.min(5, results.getAllFights().size()); i++) {
-        FightResult fight = results.getAllFights().get(i);
+    for (int i = 0; i < Math.min(5, results.allFights().size()); i++) {
+        FightResult fight = results.allFights().get(i);
         output.append("Fight ").append(i + 1).append(": ").append(fight.toString()).append("\n");
     }
     
@@ -342,23 +361,20 @@ public class HelloController {
     output.append("Expected: All fights should be draws (hit MAX_TURNS)\n\n");
     
     output.append("Results:\n");
-    output.append("  Fighter 1 Wins: ").append(results.getFighter1Wins()).append("\n");
-    output.append("  Fighter 2 Wins: ").append(results.getFighter2Wins()).append("\n");
-    output.append("  Draws: ").append(results.getDraws()).append("\n\n");
-    
-    output.append("Win Rates:\n");
-    output.append("  Fighter 1: ").append(String.format("%.1f", results.getFighter1WinRate())).append("%\n");
-    output.append("  Fighter 2: ").append(String.format("%.1f", results.getFighter2WinRate())).append("%\n");
-    output.append("  Draws: ").append(String.format("%.1f", results.getDrawRate())).append("%\n\n");
-    
+    output.append("  Fighter 1 Wins: ").append(results.fighter1Wins()).append("\n");
+    output.append("  Fighter 2 Wins: ").append(results.fighter2Wins()).append("\n");
+    output.append("  Draws: ").append(results.draws()).append("\n\n");
+
+    output.append("  Fighter 1: ").append(String.format("%.1f", results.fighter1WinRate())).append("%\n");
+    output.append("  Fighter 2: ").append(String.format("%.1f", results.fighter2WinRate())).append("%\n");
+    output.append("  Draws: ").append(String.format("%.1f", results.drawRate())).append("%\n\n");
+
     output.append("Data Consistent? ").append(results.isDataConsistent() ? "YES ✓" : "NO ✗").append("\n\n");
-    
-    // Show first fight details
-    if (!results.getAllFights().isEmpty()) {
-        FightResult firstFight = results.getAllFights().get(0);
-        output.append("First Fight Details:\n");
-        output.append("  Winner: ").append(firstFight.getWinnerName()).append("\n");
-        output.append("  Total Turns: ").append(firstFight.getTotalTurns()).append("\n");
+
+    if (!results.allFights().isEmpty()) {
+        FightResult firstFight = results.allFights().get(0);
+        output.append("  Winner: ").append(firstFight.winnerName()).append("\n");
+        output.append("  Total Turns: ").append(firstFight.totalTurns()).append("\n");
         output.append("  Was Draw? ").append(firstFight.wasDraw() ? "YES" : "NO").append("\n");
     }
     

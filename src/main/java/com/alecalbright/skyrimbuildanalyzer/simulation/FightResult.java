@@ -4,43 +4,34 @@ import java.util.List;
 
 import com.alecalbright.skyrimbuildanalyzer.model.CombatEvent;
 
-public class FightResult {
-    private final String fighter1Name;
-    private final String fighter2Name;
-    private final String winnerName;
-    private final int totalTurns;
-    private final List<CombatEvent> combatEvents;
+public record FightResult(
+    String fighter1Name,
+    String fighter2Name,
+    String winnerName,
+    int totalTurns,
+    List<CombatEvent> combatEvents
+) {
 
-    public FightResult(String fighter1Name, String fighter2Name, String winnerName, int totalTurns, List<CombatEvent> combatEvents){
-        this.fighter1Name = fighter1Name;
-        this.fighter2Name = fighter2Name;
-        this.winnerName = winnerName;
-        this.totalTurns = totalTurns;
-        this.combatEvents = List.copyOf(combatEvents);
-    }
-
-    // GETTERS
-
-    public String getFighter1Name(){
-        return fighter1Name;
+    public FightResult {
+        if(fighter1Name == null || fighter1Name.isBlank()){
+            throw new IllegalArgumentException("Fighter 1 name cannot be null or blank");
+        }
+        if(fighter2Name == null || fighter2Name.isBlank()){
+            throw new IllegalArgumentException("Fighter 2 name cannot be null or blank");
+        }
+        if(winnerName == null || winnerName.isBlank()){
+            throw new IllegalArgumentException("Winner name cannot be null or blank");
+        }
+        if(totalTurns < 0){
+            throw new IllegalArgumentException("Total turns cannot be negative");
+        }
+        if(combatEvents == null){
+            throw new IllegalArgumentException("Combat events list cannot be null");
+        }
+        
+        combatEvents = List.copyOf(combatEvents);
     }
     
-    public String getFighter2Name(){
-        return fighter2Name;
-    }
-    
-    public String getWinnerName(){
-        return winnerName;
-    }
-    
-    public int getTotalTurns(){
-        return totalTurns;
-    }
-    
-    public List<CombatEvent> getCombatEvents(){
-        return combatEvents;
-    }
-
     public boolean didFighter1Win(){
         return winnerName.equals(fighter1Name);
     }
@@ -54,21 +45,52 @@ public class FightResult {
     }
     
     public double getTotalDamageByFighter(String fighterName){
-        return combatEvents.stream().filter(event -> event.attackerName().equals(fighterName)).mapToDouble(CombatEvent::damageDealt).sum();
+        if (fighterName == null || fighterName.isBlank()) {
+            throw new IllegalArgumentException("Fighter name cannot be null or blank");
+        }
+        
+        return combatEvents.stream()
+            .filter(event -> event.attackerName().equals(fighterName))
+            .mapToDouble(CombatEvent::damageDealt)
+            .sum();
     }
     
     public double getAverageDamageByFighter(String fighterName){
-        long attackCount = combatEvents.stream().filter(event -> event.attackerName().equals(fighterName)).count();
+        if (fighterName == null || fighterName.isBlank()) {
+            throw new IllegalArgumentException("Fighter name cannot be null or blank");
+        }
         
-        if (attackCount == 0) return 0.0;
+        long attackCount = combatEvents.stream()
+            .filter(event -> event.attackerName().equals(fighterName))
+            .count();
+        
+        if (attackCount == 0) {
+            return 0.0;
+        }
         
         double totalDamage = getTotalDamageByFighter(fighterName);
         return totalDamage / attackCount;
     }
-
+    
+    public long getAttackCountByFighter(String fighterName){
+        if(fighterName == null || fighterName.isBlank()){
+            throw new IllegalArgumentException("Fighter name cannot be null or blank");
+        }
+        
+        return combatEvents.stream()
+            .filter(event -> event.attackerName().equals(fighterName))
+            .count();
+    }
+    
     @Override
-    public String toString() {
-        return String.format("Fight: %s vs %s | Winner: %s | Turns: %d | Events: %d",
-            fighter1Name, fighter2Name, winnerName, totalTurns, combatEvents.size());
+    public String toString(){
+        return String.format(
+            "Fight: %s vs %s | Winner: %s | Turns: %d | Events: %d",
+            fighter1Name,
+            fighter2Name,
+            winnerName,
+            totalTurns,
+            combatEvents.size()
+        );
     }
 }
