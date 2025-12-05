@@ -3,8 +3,6 @@ package com.alecalbright.skyrimbuildanalyzer.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-// Represents a weapon in Skyrim with given specifications
-
 @Data
 @AllArgsConstructor
 public class Weapon {

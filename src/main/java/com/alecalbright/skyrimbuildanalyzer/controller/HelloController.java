@@ -1,5 +1,7 @@
 package com.alecalbright.skyrimbuildanalyzer.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -8,12 +10,19 @@ import com.alecalbright.skyrimbuildanalyzer.model.CombatEvent;
 import com.alecalbright.skyrimbuildanalyzer.model.Perk;
 import com.alecalbright.skyrimbuildanalyzer.model.Weapon;
 import com.alecalbright.skyrimbuildanalyzer.model.WeaponType;
+import com.alecalbright.skyrimbuildanalyzer.repository.WeaponRepository;
 import com.alecalbright.skyrimbuildanalyzer.simulation.CombatSimulator;
 import com.alecalbright.skyrimbuildanalyzer.simulation.FightResult;
 import com.alecalbright.skyrimbuildanalyzer.simulation.MultiSimulationResult;
 
 @RestController
 public class HelloController {
+
+    private final WeaponRepository weaponRepository;
+
+    public HelloController(WeaponRepository weaponRepository){
+        this.weaponRepository = weaponRepository;
+    }
 
     @GetMapping("/")
     public String home(){
@@ -379,5 +388,51 @@ public class HelloController {
     }
     
     return output.toString().replace("\n", "<br>");
+    }
+
+    @GetMapping("/test-repository")
+    public String testRepository() {
+        StringBuilder result = new StringBuilder();
+        result.append("=== WEAPON REPOSITORY TEST ===\n\n");
+        
+        // Test 1: Get total count
+        result.append("Total weapons: ").append(weaponRepository.getWeaponCount()).append("\n\n");
+        
+        // Test 2: Get specific weapon
+        Weapon ebonyBow = weaponRepository.getWeapon("Ebony Bow");
+        if (ebonyBow != null) {
+            result.append("Found: ").append(ebonyBow).append("\n");
+            result.append("  DPS: ").append(ebonyBow.getDPS()).append("\n\n");
+        }
+        
+        // Test 3: Case insensitive
+        Weapon ebonyBow2 = weaponRepository.getWeapon("ebony bow");
+        result.append("Case insensitive works? ").append(ebonyBow2 != null ? "YES" : "NO").append("\n\n");
+        
+        // Test 4: Get all bows
+        List<Weapon> bows = weaponRepository.getWeaponsByType(WeaponType.BOW);
+        result.append("Bows available: ").append(bows.size()).append("\n");
+        for (Weapon bow : bows) {
+            result.append("  - ").append(bow.getName())
+                  .append(" (").append(bow.getBaseDamage()).append(" dmg, ")
+                  .append(bow.getDPS()).append(" DPS)\n");
+        }
+        result.append("\n");
+        
+        // Test 5: List all weapons
+        result.append("=== ALL WEAPONS ===\n");
+        List<Weapon> allWeapons = weaponRepository.getAllWeapons();
+        allWeapons.stream()
+            .sorted((w1, w2) -> Double.compare(w2.getDPS(), w1.getDPS()))  // Sort by DPS descending
+            .forEach(weapon -> {
+                result.append(String.format("%-25s | %4.0f dmg | %.1f speed | %.1f DPS | %s\n",
+                    weapon.getName(),
+                    weapon.getBaseDamage(),
+                    weapon.getAttackSpeed(),
+                    weapon.getDPS(),
+                    weapon.getWeaponType()));
+            });
+        
+        return result.toString().replace("\n", "<br>");
     }
 }
