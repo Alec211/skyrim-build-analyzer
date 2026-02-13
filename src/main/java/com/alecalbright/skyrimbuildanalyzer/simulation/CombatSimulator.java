@@ -30,6 +30,7 @@ public class CombatSimulator {
                 break;
             }
 
+            // Character 2 as attacker
             double damage2 = character2.calculateDamage();
             character1.takeDamage(damage2);
 

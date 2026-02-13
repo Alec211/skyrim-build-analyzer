@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alecalbright.skyrimbuildanalyzer.archetype.CharacterArchetype;
 import com.alecalbright.skyrimbuildanalyzer.model.Character;
 import com.alecalbright.skyrimbuildanalyzer.model.CombatEvent;
 import com.alecalbright.skyrimbuildanalyzer.model.Perk;
@@ -432,6 +433,34 @@ public class HelloController {
                     weapon.getDPS(),
                     weapon.getWeaponType()));
             });
+        
+        return result.toString().replace("\n", "<br>");
+    }
+
+    @GetMapping("/test-archetypes")
+    public String testArchetypes(){
+        StringBuilder result = new StringBuilder();
+        result.append("=== CHARACTER ARCHETYPES TEST ===\n\n");
+        
+        for(CharacterArchetype archetype : CharacterArchetype.values()){
+            try{
+                Character character = archetype.create(weaponRepository);
+                
+                result.append("Archetype: ").append(archetype.getDisplayName()).append("\n");
+                result.append("  Health: ").append(character.getMaxHealth()).append("\n");
+                result.append("  Stamina: ").append(character.getMaxStamina()).append("\n");
+                result.append("  Magicka: ").append(character.getMaxMagicka()).append("\n");
+                result.append("  Weapon: ").append(character.getWeapon().getName()).append(" (").append(String.format("%.1f", character.getWeapon().getDPS())).append(" DPS)\n");
+                result.append("  Skills: Archery=").append(character.getArcherySkill()).append(", Sneak=").append(character.getSneakSkill()).append(", 1H=").append(character.getOneHandedSkill()).append(", 2H=").append(character.getTwoHandedSkill()).append("\n");
+                result.append("  Perks: ").append(character.getPerks().size()).append(" equipped\n");
+                result.append("  Base Damage: ").append(String.format("%.1f", character.calculateDamage())).append("\n");
+                result.append("  Perk Multiplier: ").append(String.format("%.2fx", character.getPerkDamageMultiplier())).append("\n\n");
+                
+            } 
+            catch(Exception e){
+                result.append("  ERROR: ").append(e.getMessage()).append("\n\n");
+            }
+        }
         
         return result.toString().replace("\n", "<br>");
     }

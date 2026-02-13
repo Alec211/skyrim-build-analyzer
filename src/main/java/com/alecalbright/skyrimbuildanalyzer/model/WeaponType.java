@@ -1,5 +1,7 @@
 package com.alecalbright.skyrimbuildanalyzer.model;
 
+// Enum is used because we only want weapons to be one of these given types/only valid if its one of these types
+
 public enum WeaponType {
     ONE_HANDED_SWORD,
     ONE_HANDED_AXE,

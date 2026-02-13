@@ -1,5 +1,7 @@
 package com.alecalbright.skyrimbuildanalyzer.model;
 
+// Enum is used because we only want perks to be one of these given definitions/only valid if its one of these types
+
 public enum Perk {
 
     // ONE-HANDED PERKS

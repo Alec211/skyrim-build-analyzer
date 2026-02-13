@@ -6,6 +6,9 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
+// @Getter generates getter methods for all fields
+// @Setter generates setter methods for non-final fields
+// We avoid using @Data because we have some final fields which can't have setters
 
 @Getter
 @Setter
