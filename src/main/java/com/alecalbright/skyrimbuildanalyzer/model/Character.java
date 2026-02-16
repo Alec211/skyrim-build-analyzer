@@ -6,10 +6,6 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
-// @Getter generates getter methods for all fields
-// @Setter generates setter methods for non-final fields
-// We avoid using @Data because we have some final fields which can't have setters
-
 @Getter
 @Setter
 public class Character {
@@ -21,7 +17,6 @@ public class Character {
     private double magicka;
     private final double maxMagicka;
 
-    // Skyrim skills are represented by levels 0-100
     private int oneHandedSkill;
     private int twoHandedSkill;
     private int archerySkill;
@@ -71,6 +66,19 @@ public class Character {
         return weapon.getBaseDamage();
     }
 
+    public double calculateDamage(boolean isSneakAttack, boolean isCritical){
+        double damage = weapon.getBaseDamage() * getDamageBoostMultiplier();
+
+        if (isSneakAttack) {
+            damage *= getSneakAttackMultiplier();
+        }
+        if (isCritical) {
+            damage *= getCriticalDamageMultiplier();
+        }
+
+        return damage;
+    }
+
     public void addPerk(Perk perk){
         this.perks.add(perk);
     }
@@ -83,15 +91,51 @@ public class Character {
         return Set.copyOf(perks);
     }
 
-    public double getPerkDamageMultiplier(){
+    public double getDamageBoostMultiplier(){
         double multiplier = 1.0;
         for (Perk perk : perks) {
-            if(perk.boostsDamage()){
+            if (perk.getCategory() == PerkCategory.DAMAGE_BOOST) {
                 multiplier *= perk.getMultiplier();
             }
         }
-
         return multiplier;
+    }
+
+    public double getSneakAttackMultiplier(){
+        double highest = 1.0;
+        for (Perk perk : perks) {
+            if (perk.getCategory() == PerkCategory.SNEAK_ATTACK && perk.getMultiplier() > highest) {
+                highest = perk.getMultiplier();
+            }
+        }
+        return highest;
+    }
+
+    public double getCriticalChance(){
+        double chance = 0.05;
+        for (Perk perk : perks) {
+            if (perk.getCategory() == PerkCategory.CRITICAL) {
+                if (perk == Perk.CRITICAL_SHOT) chance += 0.15;
+                if (perk == Perk.CRITICAL_CHARGE) chance += 0.10;
+            }
+        }
+        return Math.min(chance, 0.50);
+    }
+
+    public double getCriticalDamageMultiplier(){
+        double multiplier = 1.5;
+        if (hasPerk(Perk.CRITICAL_SHOT)) {
+            multiplier = 2.0;
+        }
+        return multiplier;
+    }
+
+    public boolean canSneakAttack(){
+        return sneakSkill >= 50 && getSneakAttackMultiplier() > 1.0;
+    }
+
+    public double getPerkDamageMultiplier(){
+        return getDamageBoostMultiplier() * getSneakAttackMultiplier();
     }
 
     @Override

@@ -2,8 +2,6 @@ package com.alecalbright.skyrimbuildanalyzer.model;
 
 import java.time.LocalDateTime;
 
-// Record class is a special type of class used mainly to store data for later use
-
 public record CombatEvent(
     String attackerName,
     String defenderName,

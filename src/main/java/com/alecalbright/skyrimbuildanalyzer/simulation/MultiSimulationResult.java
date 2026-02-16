@@ -99,10 +99,6 @@ public record MultiSimulationResult(
         return winMargin() > (totalFights * 0.1);
     }
 
-    public boolean isDataConsistent(){
-        return (fighter1Wins + fighter2Wins + draws) == totalFights;
-    }
-    
     public double averageFightDuration(){
         if (allFights.isEmpty()) {
             return 0.0;

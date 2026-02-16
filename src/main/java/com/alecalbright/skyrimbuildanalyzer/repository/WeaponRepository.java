@@ -22,7 +22,6 @@ public class WeaponRepository {
     private final Map<String, Weapon> weaponCache = new HashMap<>();
     private boolean weaponsLoaded = false;
 
-    // Empty Constructor
     public WeaponRepository(){}
 
     public Weapon getWeapon(String name){
