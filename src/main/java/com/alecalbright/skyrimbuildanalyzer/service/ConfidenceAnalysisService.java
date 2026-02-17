@@ -50,19 +50,4 @@ public class ConfidenceAnalysisService {
         return zScore > Z_95;
     }
 
-    /**
-     * Calculates the minimum number of fights needed to detect a given win rate
-     * difference from 50% with 95% confidence and 80% power.
-     */
-    public int recommendedSampleSize(double desiredMarginOfError){
-        if (desiredMarginOfError <= 0 || desiredMarginOfError >= 50) {
-            throw new IllegalArgumentException("Margin of error must be between 0 and 50 percent");
-        }
-
-        double marginDecimal = desiredMarginOfError / 100.0;
-        // n = (z^2 * p * (1-p)) / E^2, using p=0.5 for maximum sample size
-        double n = (Z_95 * Z_95 * 0.25) / (marginDecimal * marginDecimal);
-
-        return (int) Math.ceil(n);
-    }
 }

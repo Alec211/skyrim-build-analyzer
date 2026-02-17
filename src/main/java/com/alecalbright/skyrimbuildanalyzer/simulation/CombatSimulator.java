@@ -26,27 +26,31 @@ public class CombatSimulator {
         while(character1.isAlive() && character2.isAlive() && turnCounter < MAX_TURNS){
             turnCounter++;
 
-            // Character 1 attacks
+            // Character 1 attacks Character 2
             boolean sneak1 = isSneak(character1, turnCounter);
             boolean crit1 = isCriticalHit(character1);
-            double finalDamage1 = character1.calculateDamage(sneak1, crit1) * applyVariance();
+            double rawDamage1 = character1.calculateDamage(sneak1, crit1) * applyVariance();
+            double reducedDamage1 = character2.applyDamageReduction(rawDamage1);
+            double blocked1 = rawDamage1 - reducedDamage1;
 
-            character2.takeDamage(finalDamage1);
+            character2.takeDamage(reducedDamage1);
             combatEvents.add(CombatEvent.now(
-                character1.getName(), character2.getName(), finalDamage1,
+                character1.getName(), character2.getName(), reducedDamage1, blocked1,
                 character1.getWeapon().getName(), crit1, sneak1
             ));
 
             if(!character2.isAlive()) break;
 
-            // Character 2 attacks
+            // Character 2 attacks Character 1
             boolean sneak2 = isSneak(character2, turnCounter);
             boolean crit2 = isCriticalHit(character2);
-            double finalDamage2 = character2.calculateDamage(sneak2, crit2) * applyVariance();
+            double rawDamage2 = character2.calculateDamage(sneak2, crit2) * applyVariance();
+            double reducedDamage2 = character1.applyDamageReduction(rawDamage2);
+            double blocked2 = rawDamage2 - reducedDamage2;
 
-            character1.takeDamage(finalDamage2);
+            character1.takeDamage(reducedDamage2);
             combatEvents.add(CombatEvent.now(
-                character2.getName(), character1.getName(), finalDamage2,
+                character2.getName(), character1.getName(), reducedDamage2, blocked2,
                 character2.getWeapon().getName(), crit2, sneak2
             ));
 

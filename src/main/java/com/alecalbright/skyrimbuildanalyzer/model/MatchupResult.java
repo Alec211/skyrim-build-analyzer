@@ -8,7 +8,7 @@ public record MatchupResult(
     CharacterArchetype archetype2,
     MultiSimulationResult simulationResult,
     double archetype1WinRate,
-    double confidenceInterval
+    double confidenceIntervalWidth
 ) {
     public MatchupResult {
         if (archetype1 == null || archetype2 == null) {
@@ -17,16 +17,6 @@ public record MatchupResult(
         if (simulationResult == null) {
             throw new IllegalArgumentException("Simulation result cannot be null");
         }
-    }
-
-    public CharacterArchetype getWinningArchetype(){
-        if (archetype1WinRate > 50.0) return archetype1;
-        if (archetype1WinRate < 50.0) return archetype2;
-        return null;
-    }
-
-    public boolean isDecisive(){
-        return Math.abs(archetype1WinRate - 50.0) > 15.0;
     }
 
     @Override

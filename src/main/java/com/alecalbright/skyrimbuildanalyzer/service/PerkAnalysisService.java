@@ -11,19 +11,22 @@ import org.springframework.stereotype.Service;
 import com.alecalbright.skyrimbuildanalyzer.archetype.CharacterArchetype;
 import com.alecalbright.skyrimbuildanalyzer.model.Character;
 import com.alecalbright.skyrimbuildanalyzer.model.Perk;
+import com.alecalbright.skyrimbuildanalyzer.repository.ArmorRepository;
 import com.alecalbright.skyrimbuildanalyzer.repository.WeaponRepository;
 
 @Service
 public class PerkAnalysisService {
 
     private final WeaponRepository weaponRepository;
+    private final ArmorRepository armorRepository;
 
-    public PerkAnalysisService(WeaponRepository weaponRepository){
+    public PerkAnalysisService(WeaponRepository weaponRepository, ArmorRepository armorRepository){
         this.weaponRepository = weaponRepository;
+        this.armorRepository = armorRepository;
     }
 
     public double calculateTheoreticalDamage(CharacterArchetype archetype){
-        Character character = archetype.create(weaponRepository);
+        Character character = archetype.create(weaponRepository, armorRepository);
         double baseDamage = character.calculateDamage();
         double perkMultiplier = character.getPerkDamageMultiplier();
         return baseDamage * perkMultiplier;
@@ -69,7 +72,7 @@ public class PerkAnalysisService {
         Map<CharacterArchetype, String> warnings = new HashMap<>();
 
         for (CharacterArchetype archetype : CharacterArchetype.values()) {
-            Character character = archetype.create(weaponRepository);
+            Character character = archetype.create(weaponRepository, armorRepository);
             double multiplier = character.getPerkDamageMultiplier();
 
             if (multiplier > 50.0) {

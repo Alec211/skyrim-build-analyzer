@@ -25,24 +25,33 @@ public class Character {
     private Set<Perk> perks;
 
     private final Weapon weapon;
+    private final Armor armor;
+    private final Shield shield;
 
-    public Character(String name, double maxHealth, double maxStamina, double maxMagicka, Weapon weapon) {
+    public Character(String name, double maxHealth, double maxStamina, double maxMagicka,
+                     Weapon weapon, Armor armor, Shield shield) {
         this.name = name;
         this.maxHealth = maxHealth;
         this.maxStamina = maxStamina;
         this.maxMagicka = maxMagicka;
         this.weapon = weapon;
-        
+        this.armor = armor;
+        this.shield = shield;
+
         this.health = maxHealth;
         this.stamina = maxStamina;
         this.magicka = maxMagicka;
-        
+
         this.oneHandedSkill = 0;
         this.twoHandedSkill = 0;
         this.archerySkill = 0;
         this.sneakSkill = 0;
 
         this.perks = new HashSet<>();
+    }
+
+    public Character(String name, double maxHealth, double maxStamina, double maxMagicka, Weapon weapon) {
+        this(name, maxHealth, maxStamina, maxMagicka, weapon, null, null);
     }
 
     public boolean isAlive(){
@@ -91,6 +100,8 @@ public class Character {
         return Set.copyOf(perks);
     }
 
+    // === Offense ===
+
     public double getDamageBoostMultiplier(){
         double multiplier = 1.0;
         for (Perk perk : perks) {
@@ -138,10 +149,68 @@ public class Character {
         return getDamageBoostMultiplier() * getSneakAttackMultiplier();
     }
 
+    // === Defense ===
+
+    public double getEffectiveArmorRating() {
+        double armorRating = (armor != null) ? armor.getBaseArmorRating() : 0.0;
+        double shieldRating = (shield != null) ? shield.getBaseArmorRating() : 0.0;
+
+        armorRating *= getArmorPerkMultiplier();
+
+        if (hasPerk(Perk.MATCHING_SET)) {
+            armorRating *= 1.25;
+        }
+
+        shieldRating *= getShieldPerkMultiplier();
+
+        return armorRating + shieldRating;
+    }
+
+    public double calculateDamageReduction() {
+        double effectiveRating = getEffectiveArmorRating();
+        double reduction = effectiveRating * 0.0012;
+        return Math.min(reduction, 0.80);
+    }
+
+    public double applyDamageReduction(double incomingDamage) {
+        double reduction = calculateDamageReduction();
+        return incomingDamage * (1.0 - reduction);
+    }
+
+    private double getArmorPerkMultiplier() {
+        if (armor == null) return 1.0;
+        ArmorWeight weight = armor.getWeight();
+
+        double highest = 1.0;
+        for (Perk perk : perks) {
+            if (perk.getCategory() != PerkCategory.DEFENSE) continue;
+
+            if (weight == ArmorWeight.HEAVY && perk.name().startsWith("JUGGERNAUT")) {
+                highest = Math.max(highest, perk.getMultiplier());
+            }
+            if (weight == ArmorWeight.LIGHT && perk.name().startsWith("AGILE_DEFENDER")) {
+                highest = Math.max(highest, perk.getMultiplier());
+            }
+        }
+        return highest;
+    }
+
+    private double getShieldPerkMultiplier() {
+        if (shield == null) return 1.0;
+
+        double highest = 1.0;
+        for (Perk perk : perks) {
+            if (perk.name().startsWith("SHIELD_WALL")) {
+                highest = Math.max(highest, perk.getMultiplier());
+            }
+        }
+        return highest;
+    }
+
     @Override
     public String toString(){
-        return String.format("%s [HP: %.0f/%.0f, Weapon: %s]", name, health, maxHealth, weapon.getName());
+        String armorInfo = (armor != null) ? armor.getName() : "None";
+        return String.format("%s [HP: %.0f/%.0f, Weapon: %s, Armor: %s]",
+            name, health, maxHealth, weapon.getName(), armorInfo);
     }
 }
-
-

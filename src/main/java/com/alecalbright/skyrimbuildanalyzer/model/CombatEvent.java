@@ -6,6 +6,7 @@ public record CombatEvent(
     String attackerName,
     String defenderName,
     double damageDealt,
+    double damageBlocked,
     String weaponUsed,
     boolean wasCritical,
     boolean wasSneakAttack,
@@ -21,13 +22,19 @@ public record CombatEvent(
         if(damageDealt < 0){
             throw new IllegalArgumentException("Damage can't be negative");
         }
+        if(damageBlocked < 0){
+            throw new IllegalArgumentException("Damage blocked can't be negative");
+        }
         if(timeStamp == null){
             throw new IllegalArgumentException("Timestamp can't be null");
         }
     }
 
-    public static CombatEvent now(String attackerName, String defenderName, double damageDealt, String weaponUsed, boolean wasCritical, boolean wasSneakAttack){
-        return new CombatEvent(attackerName, defenderName, damageDealt, weaponUsed, wasCritical, wasSneakAttack, LocalDateTime.now());
+    public static CombatEvent now(String attackerName, String defenderName,
+                                  double damageDealt, double damageBlocked,
+                                  String weaponUsed, boolean wasCritical, boolean wasSneakAttack){
+        return new CombatEvent(attackerName, defenderName, damageDealt, damageBlocked,
+            weaponUsed, wasCritical, wasSneakAttack, LocalDateTime.now());
     }
 
     public boolean isSpecialAttack(){
@@ -39,6 +46,10 @@ public record CombatEvent(
         desc.append(attackerName).append(" attacks ").append(defenderName);
         desc.append(" with ").append(weaponUsed);
         desc.append(" for ").append(String.format("%.1f", damageDealt)).append(" damage");
+
+        if(damageBlocked > 0){
+            desc.append(String.format(" (%.1f blocked by armor)", damageBlocked));
+        }
 
         if(wasCritical && wasSneakAttack){
             desc.append(" (CRITICAL SNEAK ATTACK!)");

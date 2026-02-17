@@ -12,6 +12,7 @@ import com.alecalbright.skyrimbuildanalyzer.archetype.CharacterArchetype;
 import com.alecalbright.skyrimbuildanalyzer.model.ArchetypeRanking;
 import com.alecalbright.skyrimbuildanalyzer.model.Character;
 import com.alecalbright.skyrimbuildanalyzer.model.MatchupResult;
+import com.alecalbright.skyrimbuildanalyzer.repository.ArmorRepository;
 import com.alecalbright.skyrimbuildanalyzer.repository.WeaponRepository;
 import com.alecalbright.skyrimbuildanalyzer.simulation.CombatSimulator;
 import com.alecalbright.skyrimbuildanalyzer.simulation.MultiSimulationResult;
@@ -21,13 +22,16 @@ public class ArchetypeMatchupService {
 
     private final CombatSimulator combatSimulator;
     private final WeaponRepository weaponRepository;
+    private final ArmorRepository armorRepository;
     private final ConfidenceAnalysisService confidenceService;
 
     public ArchetypeMatchupService(CombatSimulator combatSimulator,
                                    WeaponRepository weaponRepository,
+                                   ArmorRepository armorRepository,
                                    ConfidenceAnalysisService confidenceService){
         this.combatSimulator = combatSimulator;
         this.weaponRepository = weaponRepository;
+        this.armorRepository = armorRepository;
         this.confidenceService = confidenceService;
     }
 
@@ -37,8 +41,8 @@ public class ArchetypeMatchupService {
 
         for (int i = 0; i < archetypes.length; i++) {
             for (int j = i + 1; j < archetypes.length; j++) {
-                Character c1 = archetypes[i].create(weaponRepository);
-                Character c2 = archetypes[j].create(weaponRepository);
+                Character c1 = archetypes[i].create(weaponRepository, armorRepository);
+                Character c2 = archetypes[j].create(weaponRepository, armorRepository);
 
                 MultiSimulationResult result = combatSimulator.simulateMultipleFights(c1, c2, fightsPerMatchup);
 
@@ -56,17 +60,11 @@ public class ArchetypeMatchupService {
         return matchups;
     }
 
-    /**
-     * Returns an 8x8 win rate matrix. matrix[i][j] = archetype i's win rate against archetype j.
-     * Diagonal is 50.0 (mirror matchup).
-     */
-    public double[][] getMatchupMatrix(int fightsPerMatchup){
-        List<MatchupResult> matchups = runFullTournament(fightsPerMatchup);
+    public double[][] getMatchupMatrix(List<MatchupResult> matchups){
         CharacterArchetype[] archetypes = CharacterArchetype.values();
         int n = archetypes.length;
         double[][] matrix = new double[n][n];
 
-        // Diagonal = 50% (self vs self)
         for (int i = 0; i < n; i++) {
             matrix[i][i] = 50.0;
         }
@@ -81,13 +79,12 @@ public class ArchetypeMatchupService {
         return matrix;
     }
 
-    public List<ArchetypeRanking> getArchetypeRankings(int fightsPerMatchup){
-        List<MatchupResult> matchups = runFullTournament(fightsPerMatchup);
+    public List<ArchetypeRanking> getArchetypeRankings(List<MatchupResult> matchups){
         CharacterArchetype[] archetypes = CharacterArchetype.values();
 
         Map<CharacterArchetype, int[]> stats = new HashMap<>();
         for (CharacterArchetype a : archetypes) {
-            stats.put(a, new int[]{0, 0, 0}); // wins, losses, draws
+            stats.put(a, new int[]{0, 0, 0});
         }
 
         for (MatchupResult matchup : matchups) {
@@ -102,10 +99,10 @@ public class ArchetypeMatchupService {
             stats.get(matchup.archetype2())[2] += sim.draws();
         }
 
-        // Find best/worst matchups for each archetype
+        double[][] matrix = getMatchupMatrix(matchups);
+
         Map<CharacterArchetype, String> bestMatchups = new HashMap<>();
         Map<CharacterArchetype, String> worstMatchups = new HashMap<>();
-        double[][] matrix = getMatchupMatrix(fightsPerMatchup);
 
         for (int i = 0; i < archetypes.length; i++) {
             double bestRate = -1;
@@ -146,8 +143,8 @@ public class ArchetypeMatchupService {
     }
 
     public MatchupResult getSpecificMatchup(CharacterArchetype a1, CharacterArchetype a2, int fightsPerMatchup){
-        Character c1 = a1.create(weaponRepository);
-        Character c2 = a2.create(weaponRepository);
+        Character c1 = a1.create(weaponRepository, armorRepository);
+        Character c2 = a2.create(weaponRepository, armorRepository);
 
         MultiSimulationResult result = combatSimulator.simulateMultipleFights(c1, c2, fightsPerMatchup);
 

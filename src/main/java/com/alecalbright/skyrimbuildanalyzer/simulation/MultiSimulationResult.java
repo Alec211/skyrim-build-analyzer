@@ -95,10 +95,6 @@ public record MultiSimulationResult(
         return Math.abs(fighter1Wins - fighter2Wins);
     }
     
-    public boolean isSignificant(){
-        return winMargin() > (totalFights * 0.1);
-    }
-
     public double averageFightDuration(){
         if (allFights.isEmpty()) {
             return 0.0;
