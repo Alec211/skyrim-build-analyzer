@@ -1,0 +1,110 @@
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-header select {
+  padding: 0.5rem 1rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-gold);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.damage-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.summary-card.accent {
+  border-left: 2px solid var(--gold);
+}
+
+.card-label {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-value {
+  color: var(--text-bright);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.perk-breakdown-section {
+  margin-bottom: 2rem;
+}
+
+.perk-breakdown-section h3,
+.perk-efficiency-section h3 {
+  font-family: 'Cinzel', serif;
+  color: var(--gold-dim);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.perk-efficiency-section {
+  margin-bottom: 2rem;
+}
+
+.balance-warning {
+  background: rgba(184, 148, 74, 0.1);
+  border-left: 2px solid var(--amber);
+  color: var(--amber);
+  padding: 1rem 1.2rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.perks-table-wrapper {
+  overflow-x: auto;
+}
+
+.perks-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.perks-table th,
+.perks-table td {
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.perks-table th {
+  color: var(--gold-dim);
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.perks-table tbody tr:hover {
+  background: rgba(201, 169, 89, 0.05);
+}
+
+.efficiency-value {
+  color: var(--green);
+  font-weight: 700;
+}

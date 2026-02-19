@@ -1,0 +1,10 @@
+.tier-badge {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--bg-dark);
+}

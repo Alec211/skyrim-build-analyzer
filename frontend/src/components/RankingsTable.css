@@ -1,0 +1,58 @@
+.rankings-table-wrapper {
+  overflow-x: auto;
+}
+
+.rankings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.rankings-table th,
+.rankings-table td {
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.rankings-table th {
+  color: var(--gold-dim);
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rankings-table tbody tr:hover {
+  background: rgba(201, 169, 89, 0.05);
+}
+
+.archetype-name {
+  font-weight: 600;
+  color: var(--text-bright);
+}
+
+.win-rate-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 140px;
+}
+
+.win-rate-bar {
+  height: 8px;
+  background: var(--gold);
+  border-radius: 2px;
+  min-width: 2px;
+}
+
+.win-rate-cell span {
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.stat-win { color: var(--green); }
+.stat-loss { color: var(--red-bright); }
+.stat-draw { color: var(--text-secondary); }

@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import com.alecalbright.skyrimbuildanalyzer.archetype.CharacterArchetype;
 import com.alecalbright.skyrimbuildanalyzer.model.ArchetypeRanking;
 import com.alecalbright.skyrimbuildanalyzer.model.Character;
+import com.alecalbright.skyrimbuildanalyzer.model.EnemyDefinition;
 import com.alecalbright.skyrimbuildanalyzer.model.MatchupResult;
 import com.alecalbright.skyrimbuildanalyzer.repository.ArmorRepository;
+import com.alecalbright.skyrimbuildanalyzer.repository.EnemyRepository;
 import com.alecalbright.skyrimbuildanalyzer.repository.WeaponRepository;
 import com.alecalbright.skyrimbuildanalyzer.simulation.CombatSimulator;
 import com.alecalbright.skyrimbuildanalyzer.simulation.MultiSimulationResult;
@@ -23,26 +25,59 @@ public class ArchetypeMatchupService {
     private final CombatSimulator combatSimulator;
     private final WeaponRepository weaponRepository;
     private final ArmorRepository armorRepository;
+    private final EnemyRepository enemyRepository;
     private final ConfidenceAnalysisService confidenceService;
 
     public ArchetypeMatchupService(CombatSimulator combatSimulator,
                                    WeaponRepository weaponRepository,
                                    ArmorRepository armorRepository,
+                                   EnemyRepository enemyRepository,
                                    ConfidenceAnalysisService confidenceService){
         this.combatSimulator = combatSimulator;
         this.weaponRepository = weaponRepository;
         this.armorRepository = armorRepository;
+        this.enemyRepository = enemyRepository;
         this.confidenceService = confidenceService;
     }
 
-    public List<MatchupResult> runFullTournament(int fightsPerMatchup){
-        CharacterArchetype[] archetypes = CharacterArchetype.values();
+    public Character resolveFighter(String name) {
+        // Try archetype first
+        for (CharacterArchetype archetype : CharacterArchetype.values()) {
+            if (archetype.name().equalsIgnoreCase(name)
+                || archetype.getDisplayName().equalsIgnoreCase(name)) {
+                return archetype.create(weaponRepository, armorRepository);
+            }
+        }
+
+        // Try enemy
+        EnemyDefinition enemy = enemyRepository.getEnemyByName(name);
+        if (enemy != null) {
+            return enemy.toCharacter(weaponRepository, armorRepository);
+        }
+
+        throw new IllegalArgumentException("Unknown fighter: " + name
+            + ". Must be a valid archetype or enemy name.");
+    }
+
+    public List<String> getAllFighterNames(boolean includeEnemies) {
+        List<String> names = new ArrayList<>();
+        for (CharacterArchetype a : CharacterArchetype.values()) {
+            names.add(a.getDisplayName());
+        }
+        if (includeEnemies) {
+            names.addAll(enemyRepository.getEnemyNames());
+        }
+        return names;
+    }
+
+    public List<MatchupResult> runFullTournament(int fightsPerMatchup, boolean includeEnemies){
+        List<String> fighterNames = getAllFighterNames(includeEnemies);
         List<MatchupResult> matchups = new ArrayList<>();
 
-        for (int i = 0; i < archetypes.length; i++) {
-            for (int j = i + 1; j < archetypes.length; j++) {
-                Character c1 = archetypes[i].create(weaponRepository, armorRepository);
-                Character c2 = archetypes[j].create(weaponRepository, armorRepository);
+        for (int i = 0; i < fighterNames.size(); i++) {
+            for (int j = i + 1; j < fighterNames.size(); j++) {
+                Character c1 = resolveFighter(fighterNames.get(i));
+                Character c2 = resolveFighter(fighterNames.get(j));
 
                 MultiSimulationResult result = combatSimulator.simulateMultipleFights(c1, c2, fightsPerMatchup);
 
@@ -51,7 +86,7 @@ public class ArchetypeMatchupService {
                 double ciWidth = ci[1] - ci[0];
 
                 matchups.add(new MatchupResult(
-                    archetypes[i], archetypes[j], result,
+                    fighterNames.get(i), fighterNames.get(j), result,
                     result.fighter1WinRate(), ciWidth
                 ));
             }
@@ -60,81 +95,90 @@ public class ArchetypeMatchupService {
         return matchups;
     }
 
-    public double[][] getMatchupMatrix(List<MatchupResult> matchups){
-        CharacterArchetype[] archetypes = CharacterArchetype.values();
-        int n = archetypes.length;
+    public List<MatchupResult> runFullTournament(int fightsPerMatchup){
+        return runFullTournament(fightsPerMatchup, false);
+    }
+
+    public double[][] getMatchupMatrix(List<MatchupResult> matchups, List<String> fighterNames){
+        int n = fighterNames.size();
         double[][] matrix = new double[n][n];
 
+        Map<String, Integer> nameToIndex = new HashMap<>();
         for (int i = 0; i < n; i++) {
+            nameToIndex.put(fighterNames.get(i), i);
             matrix[i][i] = 50.0;
         }
 
         for (MatchupResult matchup : matchups) {
-            int i = matchup.archetype1().ordinal();
-            int j = matchup.archetype2().ordinal();
-            matrix[i][j] = matchup.archetype1WinRate();
-            matrix[j][i] = 100.0 - matchup.archetype1WinRate();
+            Integer i = nameToIndex.get(matchup.fighter1Name());
+            Integer j = nameToIndex.get(matchup.fighter2Name());
+            if (i == null || j == null) continue;
+
+            matrix[i][j] = matchup.fighter1WinRate();
+            matrix[j][i] = 100.0 - matchup.fighter1WinRate();
         }
 
         return matrix;
     }
 
-    public List<ArchetypeRanking> getArchetypeRankings(List<MatchupResult> matchups){
-        CharacterArchetype[] archetypes = CharacterArchetype.values();
-
-        Map<CharacterArchetype, int[]> stats = new HashMap<>();
-        for (CharacterArchetype a : archetypes) {
-            stats.put(a, new int[]{0, 0, 0});
+    public List<ArchetypeRanking> getArchetypeRankings(List<MatchupResult> matchups, List<String> fighterNames){
+        Map<String, int[]> stats = new HashMap<>();
+        for (String name : fighterNames) {
+            stats.put(name, new int[]{0, 0, 0});
         }
 
         for (MatchupResult matchup : matchups) {
             MultiSimulationResult sim = matchup.simulationResult();
 
-            stats.get(matchup.archetype1())[0] += sim.fighter1Wins();
-            stats.get(matchup.archetype1())[1] += sim.fighter2Wins();
-            stats.get(matchup.archetype1())[2] += sim.draws();
+            int[] s1 = stats.get(matchup.fighter1Name());
+            int[] s2 = stats.get(matchup.fighter2Name());
+            if (s1 == null || s2 == null) continue;
 
-            stats.get(matchup.archetype2())[0] += sim.fighter2Wins();
-            stats.get(matchup.archetype2())[1] += sim.fighter1Wins();
-            stats.get(matchup.archetype2())[2] += sim.draws();
+            s1[0] += sim.fighter1Wins();
+            s1[1] += sim.fighter2Wins();
+            s1[2] += sim.draws();
+
+            s2[0] += sim.fighter2Wins();
+            s2[1] += sim.fighter1Wins();
+            s2[2] += sim.draws();
         }
 
-        double[][] matrix = getMatchupMatrix(matchups);
+        double[][] matrix = getMatchupMatrix(matchups, fighterNames);
 
-        Map<CharacterArchetype, String> bestMatchups = new HashMap<>();
-        Map<CharacterArchetype, String> worstMatchups = new HashMap<>();
+        Map<String, String> bestMatchups = new HashMap<>();
+        Map<String, String> worstMatchups = new HashMap<>();
 
-        for (int i = 0; i < archetypes.length; i++) {
+        for (int i = 0; i < fighterNames.size(); i++) {
             double bestRate = -1;
             double worstRate = 101;
             String best = "None";
             String worst = "None";
 
-            for (int j = 0; j < archetypes.length; j++) {
+            for (int j = 0; j < fighterNames.size(); j++) {
                 if (i == j) continue;
                 if (matrix[i][j] > bestRate) {
                     bestRate = matrix[i][j];
-                    best = archetypes[j].getDisplayName();
+                    best = fighterNames.get(j);
                 }
                 if (matrix[i][j] < worstRate) {
                     worstRate = matrix[i][j];
-                    worst = archetypes[j].getDisplayName();
+                    worst = fighterNames.get(j);
                 }
             }
-            bestMatchups.put(archetypes[i], best);
-            worstMatchups.put(archetypes[i], worst);
+            bestMatchups.put(fighterNames.get(i), best);
+            worstMatchups.put(fighterNames.get(i), worst);
         }
 
         List<ArchetypeRanking> rankings = new ArrayList<>();
-        for (CharacterArchetype archetype : archetypes) {
-            int[] s = stats.get(archetype);
+        for (String name : fighterNames) {
+            int[] s = stats.get(name);
             int totalFights = s[0] + s[1] + s[2];
             double winRate = totalFights > 0 ? (s[0] * 100.0) / totalFights : 0.0;
             String tier = assignTier(winRate);
 
             rankings.add(new ArchetypeRanking(
-                archetype, s[0], s[1], s[2], winRate, tier,
-                bestMatchups.get(archetype), worstMatchups.get(archetype)
+                name, s[0], s[1], s[2], winRate, tier,
+                bestMatchups.get(name), worstMatchups.get(name)
             ));
         }
 
@@ -142,16 +186,19 @@ public class ArchetypeMatchupService {
         return rankings;
     }
 
-    public MatchupResult getSpecificMatchup(CharacterArchetype a1, CharacterArchetype a2, int fightsPerMatchup){
-        Character c1 = a1.create(weaponRepository, armorRepository);
-        Character c2 = a2.create(weaponRepository, armorRepository);
+    public MatchupResult getSpecificMatchup(String fighter1, String fighter2, int fightsPerMatchup){
+        Character c1 = resolveFighter(fighter1);
+        Character c2 = resolveFighter(fighter2);
 
         MultiSimulationResult result = combatSimulator.simulateMultipleFights(c1, c2, fightsPerMatchup);
 
         double[] ci = confidenceService.calculateWinRateConfidenceInterval(
             result.fighter1Wins(), result.totalFights());
 
-        return new MatchupResult(a1, a2, result, result.fighter1WinRate(), ci[1] - ci[0]);
+        return new MatchupResult(
+            c1.getName(), c2.getName(), result,
+            result.fighter1WinRate(), ci[1] - ci[0]
+        );
     }
 
     private String assignTier(double winRate){

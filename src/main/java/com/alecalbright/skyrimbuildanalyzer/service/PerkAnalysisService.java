@@ -32,9 +32,6 @@ public class PerkAnalysisService {
         return baseDamage * perkMultiplier;
     }
 
-    /**
-     * Returns a map of each perk to its individual multiplier contribution for a given archetype.
-     */
     public Map<Perk, Double> getPerkBreakdown(CharacterArchetype archetype){
         Map<Perk, Double> breakdown = new HashMap<>();
         for (Perk perk : archetype.getPerks()) {
@@ -45,10 +42,6 @@ public class PerkAnalysisService {
         return breakdown;
     }
 
-    /**
-     * Ranks all archetypes by their theoretical damage per perk invested.
-     * Higher = more efficient perk usage.
-     */
     public List<Map.Entry<CharacterArchetype, Double>> comparePerkEfficiency(){
         Map<CharacterArchetype, Double> efficiencyMap = new HashMap<>();
 
@@ -64,10 +57,7 @@ public class PerkAnalysisService {
         return sorted;
     }
 
-    /**
-     * Flags archetypes where perk multiplier stacking produces unrealistic damage.
-     * Anything over 10x total multiplier is likely unrealistic.
-     */
+    // Anything over 10x total multiplier is probably unrealistic
     public Map<CharacterArchetype, String> identifyOverkillPerks(){
         Map<CharacterArchetype, String> warnings = new HashMap<>();
 

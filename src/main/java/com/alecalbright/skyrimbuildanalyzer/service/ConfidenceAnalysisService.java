@@ -7,13 +7,9 @@ import com.alecalbright.skyrimbuildanalyzer.simulation.MultiSimulationResult;
 @Service
 public class ConfidenceAnalysisService {
 
-    // Z-score for 95% confidence level
-    private static final double Z_95 = 1.96;
+    private static final double Z_95 = 1.96; // 95% confidence
 
-    /**
-     * Wilson score interval for win rate confidence.
-     * More accurate than normal approximation for small samples or extreme proportions.
-     */
+    // Wilson score interval — better than normal approximation at small sample sizes
     public double[] calculateWinRateConfidenceInterval(int wins, int totalFights){
         if (totalFights == 0) return new double[]{0.0, 0.0};
 
@@ -31,22 +27,15 @@ public class ConfidenceAnalysisService {
         return new double[]{lower, upper};
     }
 
-    /**
-     * Tests if the win rate is significantly different from 50% (fair matchup).
-     * Uses a two-tailed binomial proportion test.
-     */
+    // Two-tailed z-test: is the win rate significantly different from 50%?
     public boolean isStatisticallySignificant(MultiSimulationResult results){
         int n = results.totalFights();
         if (n < 10) return false;
 
         double observed = (double) results.fighter1Wins() / n;
-        double expected = 0.5;
+        double standardError = Math.sqrt(0.25 / n); // 0.5 * 0.5 = 0.25
+        double zScore = Math.abs(observed - 0.5) / standardError;
 
-        // Z-test for proportion
-        double standardError = Math.sqrt(expected * (1 - expected) / n);
-        double zScore = Math.abs(observed - expected) / standardError;
-
-        // Significant at 95% confidence if |z| > 1.96
         return zScore > Z_95;
     }
 

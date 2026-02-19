@@ -12,23 +12,6 @@ public record CombatEvent(
     boolean wasSneakAttack,
     LocalDateTime timeStamp
 ){
-    public CombatEvent{
-        if(attackerName == null || attackerName.isBlank()){
-            throw new IllegalArgumentException("Attacker name can't be null or blank");
-        }
-        if(defenderName == null || defenderName.isBlank()){
-            throw new IllegalArgumentException("Defender name can't be null or blank");
-        }
-        if(damageDealt < 0){
-            throw new IllegalArgumentException("Damage can't be negative");
-        }
-        if(damageBlocked < 0){
-            throw new IllegalArgumentException("Damage blocked can't be negative");
-        }
-        if(timeStamp == null){
-            throw new IllegalArgumentException("Timestamp can't be null");
-        }
-    }
 
     public static CombatEvent now(String attackerName, String defenderName,
                                   double damageDealt, double damageBlocked,

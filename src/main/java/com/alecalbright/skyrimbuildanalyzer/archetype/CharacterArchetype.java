@@ -18,7 +18,7 @@ import com.alecalbright.skyrimbuildanalyzer.repository.WeaponRepository;
 public enum CharacterArchetype {
     STEALTH_ARCHER(
         "Stealth Archer",
-        200.0, 250.0, 100.0,
+        250.0, 260.0, 180.0,
         100, 100, 50, 50,
         new Perk[]{
             Perk.OVERDRAW_5,
@@ -33,7 +33,7 @@ public enum CharacterArchetype {
     ),
     TWO_HANDED_WARRIOR(
         "Two-Handed Warrior",
-        400.0, 300.0, 100.0,
+        310.0, 250.0, 130.0,
         50, 50, 50, 100,
         new Perk[]{
             Perk.BARBARIAN_5,
@@ -46,7 +46,7 @@ public enum CharacterArchetype {
     ),
     DUAL_WIELDING_BERSERKER(
         "Dual-Wielding Berserker",
-        300.0, 300.0, 100.0,
+        260.0, 290.0, 140.0,
         50, 75, 100, 50,
         new Perk[]{
             Perk.ARMSMAN_5,
@@ -60,7 +60,7 @@ public enum CharacterArchetype {
     ),
     ASSASSIN(
         "Assassin",
-        250.0, 250.0, 150.0,
+        220.0, 280.0, 190.0,
         50, 100, 100, 50,
         new Perk[]{
             Perk.ARMSMAN_5,
@@ -73,7 +73,7 @@ public enum CharacterArchetype {
     ),
     PALADIN(
         "Paladin",
-        350.0, 250.0, 200.0,
+        300.0, 200.0, 190.0,
         50, 50, 100, 50,
         new Perk[]{
             Perk.ARMSMAN_5,
@@ -87,7 +87,7 @@ public enum CharacterArchetype {
     ),
     BARBARIAN(
         "Barbarian",
-        500.0, 350.0, 100.0,
+        330.0, 260.0, 100.0,
         50, 50, 50, 100,
         new Perk[]{
             Perk.BARBARIAN_5,
@@ -101,7 +101,7 @@ public enum CharacterArchetype {
     ),
     RANGER(
         "Ranger",
-        300.0, 300.0, 100.0,
+        250.0, 280.0, 160.0,
         100, 75, 75, 50,
         new Perk[]{
             Perk.OVERDRAW_5,
@@ -115,7 +115,7 @@ public enum CharacterArchetype {
     ),
     SPELLSWORD(
         "Spellsword",
-        300.0, 200.0, 300.0,
+        240.0, 200.0, 250.0,
         50, 50, 100, 50,
         new Perk[]{
             Perk.ARMSMAN_5,
@@ -125,6 +125,10 @@ public enum CharacterArchetype {
         WeaponType.ONE_HANDED_SWORD,
         ArmorWeight.LIGHT, 2, false
     );
+
+    // All archetypes are level 40: 100 base + 39 level-ups × 10 = 690 total stat points (HP + Stamina + Magicka)
+    public static final int PLAYER_LEVEL = 40;
+    public static final int TOTAL_STAT_POOL = 690;
 
     private final String displayName;
     private final double baseHealth;

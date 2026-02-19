@@ -1,0 +1,84 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  /* Skyrim color palette */
+  --bg-dark: #0a0a0a;
+  --bg-panel: #141414;
+  --bg-card: #1a1a1a;
+  --bg-input: #111111;
+  --border: #2a2a2a;
+  --border-gold: #3a3a38;
+  --gold: #d5d0c4;
+  --gold-bright: #eae6dc;
+  --gold-dim: #9a968c;
+  --text-primary: #b8b4aa;
+  --text-secondary: #6e6c66;
+  --text-bright: #e0dcd2;
+  --green: #6b8e4e;
+  --red: #8b3a3a;
+  --red-bright: #a04545;
+  --blue: #5a7a9e;
+  --amber: #b8944a;
+
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--text-primary);
+  background-color: var(--bg-dark);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-dim);
+}
+
+.loading {
+  color: var(--text-secondary);
+  padding: 2rem;
+  text-align: center;
+}
+
+.error {
+  color: var(--red-bright);
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid var(--red);
+  background: rgba(139, 58, 58, 0.1);
+}

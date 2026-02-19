@@ -1,0 +1,154 @@
+.encounter-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 1.5rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.encounter-archetype label,
+.encounter-wave label,
+.encounter-fights label {
+  color: var(--gold-dim);
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.encounter-archetype select {
+  padding: 0.5rem 0.8rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-gold);
+  font-size: 0.9rem;
+}
+
+.wave-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.8rem;
+}
+
+.wave-enemy {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.8rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+}
+
+.wave-number {
+  color: var(--gold);
+  font-weight: 700;
+  min-width: 1.5rem;
+}
+
+.wave-name {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.wave-remove {
+  background: none;
+  border: none;
+  color: var(--red-bright);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 0.3rem;
+}
+
+.wave-add {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wave-add select {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.wave-add button {
+  padding: 0.4rem 1rem;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--border-gold);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.wave-add button:hover {
+  background: rgba(201, 169, 89, 0.1);
+}
+
+.simulate-btn {
+  padding: 0.7rem 2rem;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.2s, color 0.2s;
+}
+
+.simulate-btn:hover:not(:disabled) {
+  background: rgba(201, 169, 89, 0.15);
+  color: var(--gold-bright);
+}
+
+.simulate-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.encounter-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.encounter-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.encounter-stat .stat-label {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.4rem;
+}
+
+.encounter-stat .stat-value {
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.encounter-stat .stat-value.big {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+}

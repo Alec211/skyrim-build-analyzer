@@ -25,8 +25,6 @@ public class WeaponRepository {
     private final Map<String, Weapon> weaponCache = new HashMap<>();
     private boolean weaponsLoaded = false;
 
-    public WeaponRepository(){}
-
     public Weapon getWeapon(String name){
         ensureWeaponsLoaded();
 
@@ -322,6 +320,66 @@ public class WeaponRepository {
         addWeaponIfNotExists("Volendrung", 25, 0.6, WeaponType.TWO_HANDED_WARHAMMER);
         addWeaponIfNotExists("Auriel's Bow", 13, 1.0, WeaponType.BOW);
         addWeaponIfNotExists("Zephyr", 12, 1.5, WeaponType.BOW);
+
+        addEnemyWeapons();
+    }
+
+    private void addEnemyWeapons() {
+        // Draugr weapons
+        addWeaponIfNotExists("Ancient Nord Sword", 8, 1.0, WeaponType.ONE_HANDED_SWORD);
+        addWeaponIfNotExists("Ancient Nord War Axe", 9, 1.0, WeaponType.ONE_HANDED_AXE);
+        addWeaponIfNotExists("Ancient Nord Greatsword", 18, 0.7, WeaponType.TWO_HANDED_GREATSWORD);
+        addWeaponIfNotExists("Ancient Nord Battleaxe", 18, 0.7, WeaponType.TWO_HANDED_BATTLEAXE);
+        addWeaponIfNotExists("Ancient Nord Bow", 8, 1.0, WeaponType.BOW);
+        addWeaponIfNotExists("Honed Ancient Nord Sword", 11, 1.0, WeaponType.ONE_HANDED_SWORD);
+        addWeaponIfNotExists("Honed Ancient Nord Greatsword", 21, 0.7, WeaponType.TWO_HANDED_GREATSWORD);
+
+        // Bandit weapons (reuse existing, add cheap ones)
+        addWeaponIfNotExists("Iron War Axe", 7, 1.0, WeaponType.ONE_HANDED_AXE);
+        addWeaponIfNotExists("Iron Mace", 9, 0.9, WeaponType.ONE_HANDED_MACE);
+        addWeaponIfNotExists("Iron Battleaxe", 16, 0.7, WeaponType.TWO_HANDED_BATTLEAXE);
+        addWeaponIfNotExists("Iron Warhammer", 18, 0.6, WeaponType.TWO_HANDED_WARHAMMER);
+        addWeaponIfNotExists("Steel War Axe", 9, 1.0, WeaponType.ONE_HANDED_AXE);
+        addWeaponIfNotExists("Steel Mace", 11, 0.9, WeaponType.ONE_HANDED_MACE);
+        addWeaponIfNotExists("Steel Battleaxe", 18, 0.7, WeaponType.TWO_HANDED_BATTLEAXE);
+        addWeaponIfNotExists("Steel Warhammer", 20, 0.6, WeaponType.TWO_HANDED_WARHAMMER);
+        addWeaponIfNotExists("Orcish Sword", 9, 1.0, WeaponType.ONE_HANDED_SWORD);
+        addWeaponIfNotExists("Orcish War Axe", 10, 1.0, WeaponType.ONE_HANDED_AXE);
+
+        // Dragon attacks (modeled as weapons)
+        addWeaponIfNotExists("Dragon Bite", 50, 0.5, WeaponType.ONE_HANDED_MACE);
+        addWeaponIfNotExists("Elder Dragon Bite", 75, 0.5, WeaponType.ONE_HANDED_MACE);
+        addWeaponIfNotExists("Ancient Dragon Bite", 100, 0.5, WeaponType.ONE_HANDED_MACE);
+        addWeaponIfNotExists("Legendary Dragon Bite", 150, 0.4, WeaponType.ONE_HANDED_MACE);
+
+        // Falmer weapons
+        addWeaponIfNotExists("Falmer Sword", 7, 1.0, WeaponType.ONE_HANDED_SWORD);
+        addWeaponIfNotExists("Falmer War Axe", 9, 1.0, WeaponType.ONE_HANDED_AXE);
+        addWeaponIfNotExists("Falmer Bow", 10, 1.0, WeaponType.BOW);
+        addWeaponIfNotExists("Honed Falmer Sword", 10, 1.0, WeaponType.ONE_HANDED_SWORD);
+
+        // Forsworn weapons
+        addWeaponIfNotExists("Forsworn Sword", 10, 1.0, WeaponType.ONE_HANDED_SWORD);
+        addWeaponIfNotExists("Forsworn Axe", 11, 1.0, WeaponType.ONE_HANDED_AXE);
+        addWeaponIfNotExists("Forsworn Bow", 12, 1.0, WeaponType.BOW);
+
+        // Animal attacks
+        addWeaponIfNotExists("Wolf Bite", 8, 1.2, WeaponType.ONE_HANDED_MACE);
+        addWeaponIfNotExists("Bear Claws", 25, 0.7, WeaponType.ONE_HANDED_MACE);
+        addWeaponIfNotExists("Sabre Cat Claws", 30, 0.8, WeaponType.ONE_HANDED_MACE);
+        addWeaponIfNotExists("Giant Club", 60, 0.4, WeaponType.TWO_HANDED_WARHAMMER);
+        addWeaponIfNotExists("Troll Claws", 20, 0.9, WeaponType.ONE_HANDED_MACE);
+
+        // Dwemer Automaton attacks
+        addWeaponIfNotExists("Dwarven Sphere Attack", 25, 0.8, WeaponType.ONE_HANDED_MACE);
+        addWeaponIfNotExists("Dwarven Centurion Hammer", 60, 0.4, WeaponType.TWO_HANDED_WARHAMMER);
+        addWeaponIfNotExists("Dwarven Spider Attack", 8, 1.2, WeaponType.ONE_HANDED_MACE);
+
+        // Daedra attacks
+        addWeaponIfNotExists("Dremora Greatsword", 22, 0.7, WeaponType.TWO_HANDED_GREATSWORD);
+        addWeaponIfNotExists("Flame Atronach Attack", 10, 1.0, WeaponType.ONE_HANDED_MACE);
+        addWeaponIfNotExists("Frost Atronach Slam", 30, 0.6, WeaponType.TWO_HANDED_WARHAMMER);
+        addWeaponIfNotExists("Storm Atronach Strike", 35, 0.6, WeaponType.TWO_HANDED_WARHAMMER);
     }
 
     private void addWeaponIfNotExists(String name, double damage, double speed, WeaponType type){

@@ -1,0 +1,95 @@
+.matchup-explorer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.explorer-select {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.explorer-select label {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.explorer-select select {
+  padding: 0.5rem 1rem;
+  background: var(--bg-input);
+  color: var(--text-bright);
+  border: 1px solid var(--border-gold);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.explorer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.explorer-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+
+.explorer-opponent {
+  min-width: 180px;
+  color: var(--text-bright);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.explorer-bar-track {
+  flex: 1;
+  height: 24px;
+  background: var(--bg-dark);
+  position: relative;
+  overflow: hidden;
+}
+
+.explorer-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.explorer-bar-fill.win {
+  background: rgba(107, 142, 78, 0.6);
+}
+
+.explorer-bar-fill.loss {
+  background: rgba(160, 69, 69, 0.5);
+}
+
+.explorer-bar-label {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-bright);
+}
+
+.explorer-result {
+  min-width: 90px;
+  text-align: right;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.explorer-result.win {
+  color: var(--green);
+}
+
+.explorer-result.loss {
+  color: var(--red-bright);
+}
